@@ -2,46 +2,137 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Spanisch Video-Call</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hablamos - KI Spanisch-Coach</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* --- DESIGN & LAYOUT --- */
         :root {
             --bg-color: #0b0c10;
             --card-bg: #1f2833;
             --text-main: #c5c6c7;
-            --accent: #66fcf1;
-            --accent-hover: #45a29e;
-            --success: #4CAF50;
-            --warning: #FFC107;
-            --danger: #F44336;
+            --accent-color: #66fcf1;
+            --accent-dark: #45a29e;
+            --green: #2ecc71;
+            --yellow: #f1c40f;
+            --red: #e74c3c;
+            --sidebar-width: 260px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding: 20px;
-            padding-bottom: 100px;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        header {
+        /* --- SIDEBAR (Multi-Chat) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--card-bg);
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            border-bottom: 1px solid #333;
+        }
+
+        .new-chat-btn {
+            margin: 15px;
+            padding: 12px;
+            background-color: var(--accent-dark);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .new-chat-btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .chat-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            list-style: none;
+        }
+
+        .chat-list li {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #2a3644;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--card-bg);
+            transition: background 0.2s;
         }
 
-        h1 {
-            font-size: 1.5rem;
-            color: var(--accent);
+        .chat-list li:hover {
+            background-color: #2a3644;
+        }
+
+        .chat-list li.active {
+            background-color: #2a3644;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .chat-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 80%;
+        }
+
+        .delete-chat {
+            color: var(--red);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        /* --- HAUPTBEREICH --- */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .top-bar {
+            padding: 15px 25px;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
 
         .settings-btn {
@@ -50,417 +141,602 @@
             color: var(--text-main);
             font-size: 1.5rem;
             cursor: pointer;
+            transition: 0.2s;
         }
 
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
+        .settings-btn:hover {
+            color: var(--accent-color);
         }
 
-        label {
+        select {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            border: 1px solid #444;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* --- VOKABELSPEICHER --- */
+        .vocab-panel {
+            padding: 15px 25px;
+            background-color: #151a22;
+            border-bottom: 1px solid #333;
+        }
+
+        .vocab-panel label {
+            font-size: 0.9rem;
+            color: var(--accent-dark);
+            font-weight: bold;
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
-            color: var(--accent);
         }
 
-        textarea, select, input {
+        .vocab-panel textarea {
             width: 100%;
-            padding: 12px;
+            height: 60px;
             background-color: var(--bg-color);
-            border: 1px solid #333;
-            color: white;
+            color: var(--text-main);
+            border: 1px solid #444;
             border-radius: 8px;
-            font-size: 1rem;
-            margin-bottom: 10px;
+            padding: 10px;
+            resize: none;
         }
 
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--accent);
-            color: var(--bg-color);
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .chat-container {
+        /* --- CHAT FENSTER --- */
+        .chat-window {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+
+        .msg-user-wrapper {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .msg-ai-wrapper {
+            align-self: flex-start;
+            align-items: flex-start;
+        }
+
+        .message-bubble {
+            padding: 15px 20px;
+            border-radius: 12px;
+            line-height: 1.5;
+            font-size: 1.1rem;
         }
 
         .msg-user {
-            align-self: flex-end;
-            background-color: #2c3e50;
-            padding: 12px;
-            border-radius: 12px 12px 0 12px;
-            max-width: 85%;
+            background-color: var(--accent-dark);
+            color: #fff;
+            border-bottom-right-radius: 2px;
         }
 
         .msg-ai {
-            align-self: flex-start;
-            background-color: #1f2833;
-            padding: 12px;
-            border-radius: 12px 12px 12px 0;
-            max-width: 85%;
-            border-left: 4px solid var(--accent);
+            background-color: var(--card-bg);
+            border: 1px solid #333;
+            border-bottom-left-radius: 2px;
         }
 
+        /* --- LEHRER FEEDBACK BOX --- */
         .feedback-box {
-            margin-top: 8px;
-            padding: 10px;
+            margin-top: 5px;
+            padding: 10px 15px;
             border-radius: 8px;
-            font-size: 0.9rem;
-            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 500;
+            max-width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .feedback-perfect { background-color: rgba(76, 175, 80, 0.2); border: 1px solid var(--success); }
-        .feedback-warning { background-color: rgba(255, 193, 7, 0.2); border: 1px solid var(--warning); }
-        .feedback-error { background-color: rgba(244, 67, 54, 0.2); border: 1px solid var(--danger); }
+        .feedback-green { background-color: rgba(46, 204, 113, 0.2); border: 1px solid var(--green); color: var(--green); }
+        .feedback-yellow { background-color: rgba(241, 196, 15, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
+        .feedback-red { background-color: rgba(231, 76, 60, 0.2); border: 1px solid var(--red); color: var(--red); }
 
-        .mic-btn-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 80px;
-        }
-
-        .mic-btn {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background-color: var(--danger);
-            color: white;
-            font-size: 2rem;
+        /* --- MIKROFON BEREICH --- */
+        .action-bar {
+            padding: 25px;
+            background-color: var(--card-bg);
+            border-top: 1px solid #333;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
         }
 
-        .mic-btn.listening {
+        .mic-btn {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--accent-color);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mic-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .mic-btn.recording {
+            background-color: var(--red);
+            box-shadow: 0 0 25px var(--red);
+            color: white;
             animation: pulse 1.5s infinite;
-            background-color: var(--warning);
         }
 
         @keyframes pulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 193, 7, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
-        /* Modal Styles */
+        /* --- MODAL (API TRESOR) --- */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.9);
+            background-color: rgba(0,0,0,0.85);
             justify-content: center;
             align-items: center;
-            z-padding: 20px;
             z-index: 1000;
         }
 
         .modal-content {
             background-color: var(--card-bg);
-            padding: 20px;
+            padding: 35px;
             border-radius: 12px;
             width: 90%;
             max-width: 400px;
+            text-align: center;
+            border: 1px solid #333;
         }
 
-        .loader {
-            text-align: center;
-            color: var(--accent);
-            margin: 10px 0;
+        .modal-content h3 {
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            background-color: var(--bg-color);
+            border: 1px solid #444;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .modal-content button {
+            padding: 12px 25px;
+            background-color: var(--accent-dark);
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .loading-indicator {
             display: none;
+            color: var(--accent-color);
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>🇪🇸 Spanisch Call</h1>
-        <button class="settings-btn" onclick="openSettings()">⚙️</button>
-    </header>
-
-    <div class="card" id="setup-card">
-        <label>Dein Sprachniveau:</label>
-        <select id="difficulty">
-            <option value="🟢 Leicht">🟢 Leicht</option>
-            <option value="🟡 Mittel" selected>🟡 Mittel</option>
-            <option value="🔴 Schwer">🔴 Schwer</option>
-        </select>
-
-        <label>Deine Vokabeln (kommagetrennt):</label>
-        <textarea id="vocab-input" rows="4" placeholder="hola, yo, soy, perro, gato..."></textarea>
-
-        <button onclick="startCall()">📞 Call Starten</button>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-comments"></i> Hablamos
+        </div>
+        <button class="new-chat-btn" onclick="createNewChat()">
+            <i class="fas fa-plus"></i> Neuer Call
+        </button>
+        <ul class="chat-list" id="chatList">
+            </ul>
     </div>
 
-    <div class="loader" id="loader">KI denkt nach... 🧠</div>
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="top-controls">
+                <select id="difficultySelect" onchange="saveSettings()">
+                    <option value="leicht">🟢 Leicht (Kurze Sätze)</option>
+                    <option value="mittel" selected>🟡 Mittel (Normal)</option>
+                    <option value="schwer">🔴 Schwer (Komplex)</option>
+                </select>
+            </div>
+            <button class="settings-btn" onclick="openModal()" title="API Tresor">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
 
-    <div class="chat-container" id="chat-container"></div>
+        <div class="vocab-panel">
+            <label for="vocabInput"><i class="fas fa-book"></i> Mein Wortschatz (Komma getrennt)</label>
+            <textarea id="vocabInput" placeholder="hola, yo, soy, perro, gato..."></textarea>
+        </div>
 
-    <div class="mic-btn-container" id="mic-container" style="display: none;">
-        <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤</button>
+        <div class="chat-window" id="chatWindow">
+            </div>
+        
+        <div class="loading-indicator" id="loadingIndicator">KI denkt nach...</div>
+
+        <div class="action-bar">
+            <button class="mic-btn" id="micBtn" onclick="toggleRecording()">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
     </div>
 
-    <div class="modal" id="settings-modal">
+    <div class="modal" id="apiModal">
         <div class="modal-content">
-            <h2 style="color: var(--accent); margin-bottom: 15px;">Tresor</h2>
-            <label>Groq API-Key:</label>
-            <input type="password" id="api-key-input" placeholder="gsk_...">
-            <button onclick="saveSettings()" style="margin-bottom: 10px;">💾 Speichern</button>
-            <button onclick="closeSettings()" style="background-color: #333; color: white;">Abbrechen</button>
+            <h3><i class="fas fa-key"></i> Groq API Tresor</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem;">Dein Key wird nur lokal auf dem Handy gespeichert.</p>
+            <input type="password" id="apiKeyInput" placeholder="gsk_...">
+            <button onclick="saveApiKey()">Speichern & Schließen</button>
         </div>
     </div>
 
     <script>
-        let chatHistory = [];
-        let recognition;
-        let isListening = false;
+        // DOM Elemente
+        const chatWindow = document.getElementById('chatWindow');
+        const chatList = document.getElementById('chatList');
+        const vocabInput = document.getElementById('vocabInput');
+        const difficultySelect = document.getElementById('difficultySelect');
+        const micBtn = document.getElementById('micBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const apiModal = document.getElementById('apiModal');
+        const apiKeyInput = document.getElementById('apiKeyInput');
 
-        // --- INIT & LOCALSTORAGE ---
+        // State & Daten
+        let chats = JSON.parse(localStorage.getItem('hablamos_chats')) || {};
+        let currentChatId = localStorage.getItem('hablamos_current_chat') || null;
+        let isRecording = false;
+        let recognition = null;
+        let synth = window.speechSynthesis;
+
+        // --- INITIALISIERUNG ---
         window.onload = () => {
-            const savedKey = localStorage.getItem('groqKey');
-            const savedVocab = localStorage.getItem('vocab');
-            const savedDiff = localStorage.getItem('difficulty');
-            const savedChat = localStorage.getItem('chatHistory');
+            // Lade Vokabeln & Einstellungen
+            vocabInput.value = localStorage.getItem('hablamos_vocab') || '';
+            const savedDiff = localStorage.getItem('hablamos_difficulty');
+            if(savedDiff) difficultySelect.value = savedDiff;
 
-            if(savedKey) document.getElementById('api-key-input').value = savedKey;
-            if(savedVocab) document.getElementById('vocab-input').value = savedVocab;
-            if(savedDiff) document.getElementById('difficulty').value = savedDiff;
+            // Vokabeln automatisch bei Eingabe speichern
+            vocabInput.addEventListener('input', () => {
+                localStorage.setItem('hablamos_vocab', vocabInput.value);
+            });
 
-            if(savedChat) {
-                chatHistory = JSON.parse(savedChat);
-                if(chatHistory.length > 0) {
-                    document.getElementById('setup-card').style.display = 'none';
-                    document.getElementById('mic-container').style.display = 'block';
-                    renderChat();
+            // Chats initialisieren
+            if (Object.keys(chats).length === 0) {
+                createNewChat();
+            } else {
+                if (!currentChatId || !chats[currentChatId]) {
+                    currentChatId = Object.keys(chats)[0];
                 }
+                renderChatList();
+                renderChatMessages();
             }
 
             setupSpeechRecognition();
         };
 
-        // --- SETTINGS ---
-        function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
-        function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
-        function saveSettings() {
-            const key = document.getElementById('api-key-input').value;
-            localStorage.setItem('groqKey', key);
-            closeSettings();
-            alert("Key sicher im Browser gespeichert!");
+        // --- MULTI-CHAT SYSTEM ---
+        function createNewChat() {
+            const id = 'chat_' + Date.now();
+            chats[id] = {
+                title: 'Neuer Call ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                messages: []
+            };
+            currentChatId = id;
+            saveChatsData();
+            renderChatList();
+            renderChatMessages();
         }
 
-        // --- SPEECH RECOGNITION (Web Speech API) ---
-        function setupSpeechRecognition() {
-            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!window.SpeechRecognition) {
-                alert("Dein Browser unterstützt die Spracheingabe nicht. Bitte nutze Chrome oder Safari!");
+        function switchChat(id) {
+            currentChatId = id;
+            localStorage.setItem('hablamos_current_chat', id);
+            renderChatList();
+            renderChatMessages();
+        }
+
+        function deleteChat(event, id) {
+            event.stopPropagation();
+            delete chats[id];
+            
+            if (Object.keys(chats).length === 0) {
+                createNewChat();
+            } else if (currentChatId === id) {
+                currentChatId = Object.keys(chats)[0];
+            }
+            saveChatsData();
+            renderChatList();
+            renderChatMessages();
+        }
+
+        function saveChatsData() {
+            localStorage.setItem('hablamos_chats', JSON.stringify(chats));
+            localStorage.setItem('hablamos_current_chat', currentChatId);
+        }
+
+        function renderChatList() {
+            chatList.innerHTML = '';
+            for (const [id, chatData] of Object.entries(chats)) {
+                const li = document.createElement('li');
+                if (id === currentChatId) li.className = 'active';
+                li.onclick = () => switchChat(id);
+                
+                li.innerHTML = `
+                    <span class="chat-title">${chatData.title}</span>
+                    <button class="delete-chat" onclick="deleteChat(event, '${id}')"><i class="fas fa-trash"></i></button>
+                `;
+                chatList.appendChild(li);
+            }
+        }
+
+        // --- CHAT RENDERING ---
+        function renderChatMessages() {
+            chatWindow.innerHTML = '';
+            const messages = chats[currentChatId].messages;
+            
+            if(messages.length === 0) {
+                chatWindow.innerHTML = '<div style="text-align:center; color:#777; margin-top:50px;">Drücke das Mikrofon und starte das Gespräch auf Spanisch!</div>';
                 return;
             }
+
+            messages.forEach(msg => {
+                if (msg.role === 'user') {
+                    appendUserMessageHTML(msg.text, msg.feedback);
+                } else if (msg.role === 'ai') {
+                    appendAIMessageHTML(msg.text);
+                }
+            });
+            scrollToBottom();
+        }
+
+        function appendUserMessageHTML(text, feedbackObj) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-container msg-user-wrapper';
+            
+            let html = `<div class="message-bubble msg-user">${text}</div>`;
+            
+            // 3-Stufen-Lehrer-Feedback rendern
+            if (feedbackObj) {
+                let fbClass = 'feedback-green';
+                let icon = '<i class="fas fa-check-circle"></i>';
+                
+                if (feedbackObj.status === 'yellow') {
+                    fbClass = 'feedback-yellow';
+                    icon = '<i class="fas fa-exclamation-triangle"></i>';
+                } else if (feedbackObj.status === 'red') {
+                    fbClass = 'feedback-red';
+                    icon = '<i class="fas fa-times-circle"></i>';
+                }
+                
+                html += `<div class="feedback-box ${fbClass}">${icon} ${feedbackObj.text}</div>`;
+            }
+            
+            wrapper.innerHTML = html;
+            chatWindow.appendChild(wrapper);
+            scrollToBottom();
+        }
+
+        function appendAIMessageHTML(text) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-container msg-ai-wrapper';
+            wrapper.innerHTML = `<div class="message-bubble msg-ai">${text}</div>`;
+            chatWindow.appendChild(wrapper);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // --- SPRACHERKENNUNG (Web Speech API) ---
+        function setupSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("Dein Browser unterstützt die Spracherkennung leider nicht. Bitte nutze Chrome oder Edge.");
+                return;
+            }
+            
             recognition = new SpeechRecognition();
-            recognition.lang = 'es-ES';
+            recognition.lang = 'es-ES'; 
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
 
             recognition.onstart = () => {
-                isListening = true;
-                document.getElementById('mic-btn').classList.add('listening');
+                isRecording = true;
+                micBtn.classList.add('recording');
             };
 
             recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript;
-                handleUserMessage(transcript);
+                handleUserVoiceInput(transcript);
             };
 
             recognition.onerror = (event) => {
-                alert("Spracherkennung fehlgeschlagen: " + event.error);
-                stopMic();
+                console.error("Spracherkennungs-Fehler:", event.error);
+                stopRecordingUI();
             };
 
             recognition.onend = () => {
-                stopMic();
+                stopRecordingUI();
             };
         }
 
-        function toggleMic() {
-            if (isListening) {
+        function toggleRecording() {
+            if (!recognition) return;
+            
+            if (isRecording) {
                 recognition.stop();
             } else {
+                // Audioausgabe stoppen, falls sie noch redet
+                synth.cancel(); 
                 recognition.start();
             }
         }
 
-        function stopMic() {
-            isListening = false;
-            document.getElementById('mic-btn').classList.remove('listening');
+        function stopRecordingUI() {
+            isRecording = false;
+            micBtn.classList.remove('recording');
         }
 
-        // --- TEXT TO SPEECH ---
-        function speakSpanish(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'es-ES';
-            utterance.rate = 0.9;
-            window.speechSynthesis.speak(utterance);
-        }
-
-        // --- LOGIC ---
-        async function startCall() {
-            const vocab = document.getElementById('vocab-input').value;
-            const diff = document.getElementById('difficulty').value;
-            
-            localStorage.setItem('vocab', vocab);
-            localStorage.setItem('difficulty', diff);
-
-            document.getElementById('setup-card').style.display = 'none';
-            document.getElementById('mic-container').style.display = 'block';
-
-            // Start Message
-            handleUserMessage("Start", true);
-        }
-
-        async function handleUserMessage(text, isStart = false) {
-            const key = localStorage.getItem('groqKey');
-            if (!key) {
-                alert("Bitte hinterlege zuerst deinen Groq API-Key im Zahnrad-Menü!");
+        // --- CORE LOGIK: GROQ API CALL ---
+        async function handleUserVoiceInput(transcript) {
+            const apiKey = localStorage.getItem('hablamos_groq_key');
+            if (!apiKey) {
+                openModal();
+                alert("Bitte trage zuerst deinen Groq API Key ein!");
                 return;
             }
 
-            document.getElementById('loader').style.display = 'block';
+            loadingIndicator.style.display = 'block';
 
-            if (!isStart) {
-                // Zeige User-Text sofort, bevor KI antwortet
-                chatHistory.push({ role: "user", content: text, eval: null });
-                renderChat();
-            }
-
-            const vocab = localStorage.getItem('vocab');
-            const diff = localStorage.getItem('difficulty');
-            const vocabArray = vocab.split(',').map(v => v.trim()).filter(v => v);
-            const randomWord = vocabArray[Math.floor(Math.random() * vocabArray.length)] || "";
-
-            // Prompt Konstruktion
-            const sysPrompt = `Du bist ein spanischer Sprachpartner UND ein strenger Lehrer. WICHTIG: Antworte zwingend im JSON-Format!
-ABSOLUTES VERBOT: Nutze für deine spanische Antwort AUSSCHLIESSLICH diese Wörter: [${vocab}]. Keine Ausnahmen!
-ANTI-ECHO: Wiederhole niemals den User. Stelle eine völlig NEUE Frage.
-
-Niveau: ${diff}. Beende deine Antwort immer mit einem Fragezeichen (?).
-${isStart ? `STARTE DAS GESPRÄCH: Stelle eine spanische Frage und nutze zwingend das Wort '${randomWord}'.` : `Bewerte meinen Satz streng auf Grammatik/Sinn und antworte auf Spanisch.`}
-
-Gib deine Antwort AUSSCHLIESSLICH als gültiges JSON zurück:
-{
-  "stufe": "Perfekt, Leichter Fehler oder Falsch",
-  "feedback": "Kurzes deutsches Feedback",
-  "antwort": "Deine spanische Antwort"
-}`;
-
-            const messages = [{ role: "system", content: sysPrompt }];
-            
-            // Kontext laden (max 4 letzte Nachrichten)
-            const context = chatHistory.slice(-4).map(msg => ({
-                role: msg.role,
-                content: msg.role === 'user' ? msg.content : msg.content // Wenn KI, dann nur der pure Text
-            }));
-            messages.push(...context);
-
-            if (isStart) {
-                messages.push({ role: "user", content: "Start" });
-            }
-
+            // Groq API Call mit strengem JSON Mode für Lehrer + Antwort
             try {
+                const difficulty = difficultySelect.value;
+                const vocab = vocabInput.value.trim();
+                
+                const systemPrompt = `
+Du bist ein Spanisch-Lehrer und Gesprächspartner.
+SCHWIERIGKEITSGRAD: ${difficulty}. (Leicht=kurze Sätze, Schwer=komplexer).
+ERLAUBTE VOKABELN (Absolutes Verbot für andere Hauptwörter): ${vocab || 'Normale Konversation'}.
+
+ANTI-ECHO REGEL: Wiederhole niemals einfach den Satz des Users! Du MUSST eine völlig neue inhaltliche Frage stellen.
+
+GIB DEINE ANTWORT ZWINGEND IM FOLGENDEN JSON FORMAT ZURÜCK:
+{
+  "feedback": {
+    "status": "green", // green (perfekt), yellow (kleiner Grammatikfehler), red (komplett falsch/unverständlich)
+    "text": "Dein kurzes deutsches Lehrer-Feedback zur Grammatik des Users."
+  },
+  "reply": "Deine spanische Antwort und neue Frage."
+}
+                `;
+
+                // Baue die Historie für das Modell auf
+                let messages = [{ role: 'system', content: systemPrompt }];
+                
+                // Letzte 5 Nachrichten aus dem aktuellen Chat als Kontext mitgeben
+                const currentHistory = chats[currentChatId].messages;
+                const recentContext = currentHistory.slice(-5);
+                recentContext.forEach(m => {
+                    messages.push({ role: m.role, content: m.text });
+                });
+                
+                // Die neue User-Nachricht
+                messages.push({ role: 'user', content: transcript });
+
                 const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${key}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
                     },
                     body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
+                        model: 'llama-3.1-8b-instant',
                         messages: messages,
+                        response_format: { type: "json_object" },
                         temperature: 0.3,
-                        max_tokens: 250,
-                        response_format: { type: "json_object" }
+                        max_tokens: 250
                     })
                 });
 
-                if (!response.ok) throw new Error("API Fehler");
+                if (!response.ok) throw new Error("API Limit oder Netzwerkfehler.");
 
                 const data = await response.json();
-                const result = JSON.parse(data.choices[0].message.content);
-
-                const aiReply = result.antwort || "¿Perdón?";
+                const aiResponseJSON = JSON.parse(data.choices[0].message.content);
                 
-                if (!isStart && chatHistory.length > 0) {
-                    // Feedback an die letzte User-Nachricht anhängen
-                    chatHistory[chatHistory.length - 1].eval = {
-                        stufe: result.stufe || "Fehler",
-                        feedback: result.feedback || "Kein Feedback."
-                    };
+                const feedbackStatus = aiResponseJSON.feedback.status || 'green';
+                const feedbackText = aiResponseJSON.feedback.text || 'Gut gemacht!';
+                const aiReply = aiResponseJSON.reply || 'Lo siento, no entendí.';
+
+                // Speichere in Chat History
+                chats[currentChatId].messages.push({
+                    role: 'user', 
+                    text: transcript,
+                    feedback: { status: feedbackStatus, text: feedbackText }
+                });
+                
+                chats[currentChatId].messages.push({
+                    role: 'ai',
+                    text: aiReply
+                });
+
+                // Titel des Chats aktualisieren (erste Nachricht)
+                if (chats[currentChatId].messages.length <= 2) {
+                    chats[currentChatId].title = transcript.substring(0, 20) + '...';
                 }
 
-                chatHistory.push({ role: "assistant", content: aiReply });
-                
-                localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-                renderChat();
+                saveChatsData();
+                renderChatList();
+                renderChatMessages();
+
+                // Sprachausgabe (TTS)
                 speakSpanish(aiReply);
 
             } catch (error) {
-                alert("Verbindungsfehler zur KI. Checke deinen Key!");
+                console.error(error);
+                appendAIMessageHTML("⚠️ Verbindungsfehler: Bitte überprüfe deinen API Key oder versuche es nochmal.");
+            } finally {
+                loadingIndicator.style.display = 'none';
             }
-
-            document.getElementById('loader').style.display = 'none';
         }
 
-        // --- RENDER UI ---
-        function renderChat() {
-            const container = document.getElementById('chat-container');
-            container.innerHTML = "";
-
-            chatHistory.forEach(msg => {
-                const div = document.createElement('div');
-                
-                if (msg.role === 'user') {
-                    div.className = 'msg-user';
-                    div.innerHTML = `<strong>👤 Du:</strong> ${msg.content}`;
-                    
-                    if (msg.eval) {
-                        let evalClass = 'feedback-error';
-                        let icon = '❌';
-                        if (msg.eval.stufe.includes('Perfekt')) { evalClass = 'feedback-perfect'; icon = '✅'; }
-                        else if (msg.eval.stufe.includes('Fehler')) { evalClass = 'feedback-warning'; icon = '⚠️'; }
-
-                        div.innerHTML += `
-                            <div class="feedback-box ${evalClass}">
-                                <strong>${icon} ${msg.eval.stufe}:</strong> ${msg.eval.feedback}
-                            </div>
-                        `;
-                    }
-                } else {
-                    div.className = 'msg-ai';
-                    div.innerHTML = `<strong>🤖 KI:</strong> ${msg.content}`;
-                }
-                
-                container.appendChild(div);
-            });
-
-            window.scrollTo(0, document.body.scrollHeight);
+        // --- SPRACHAUSGABE (TTS) ---
+        function speakSpanish(text) {
+            if (synth.speaking) {
+                console.error('speechSynthesis.speaking');
+                return;
+            }
+            const utterThis = new SpeechSynthesisUtterance(text);
+            utterThis.lang = 'es-ES';
+            utterThis.rate = 0.9; // Leicht gedrosseltes Tempo für besseres Verständnis
+            synth.speak(utterThis);
         }
+
+        // --- EINSTELLUNGEN (Tresor) ---
+        function saveSettings() {
+            localStorage.setItem('hablamos_difficulty', difficultySelect.value);
+        }
+
+        function openModal() {
+            apiKeyInput.value = localStorage.getItem('hablamos_groq_key') || '';
+            apiModal.style.display = 'flex';
+        }
+
+        function saveApiKey() {
+            const val = apiKeyInput.value.trim();
+            if(val) {
+                localStorage.setItem('hablamos_groq_key', val);
+            }
+            apiModal.style.display = 'none';
+        }
+
     </script>
 </body>
 </html>
