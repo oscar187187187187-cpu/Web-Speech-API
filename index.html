@@ -2,12 +2,12 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hablamos - KI Spanisch-Coach</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hablamos - KI Coach</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- DESIGN & LAYOUT --- */
+        /* --- IRON WILL DESIGN (iPhone Optimized) --- */
         :root {
             --bg-color: #0b0c10;
             --card-bg: #1f2833;
@@ -17,123 +17,47 @@
             --green: #2ecc71;
             --yellow: #f1c40f;
             --red: #e74c3c;
-            --sidebar-width: 260px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
+            flex-direction: column;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* --- SIDEBAR (Multi-Chat) --- */
-        .sidebar {
-            width: var(--sidebar-width);
+        /* --- HEADER --- */
+        .top-bar {
+            padding: 20px;
             background-color: var(--card-bg);
-            border-right: 1px solid #333;
             display: flex;
-            flex-direction: column;
-            z-index: 10;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 100;
         }
 
-        .sidebar-header {
-            padding: 20px;
-            text-align: center;
-            font-size: 1.5rem;
+        .logo {
+            font-size: 1.2rem;
             font-weight: bold;
             color: var(--accent-color);
-            border-bottom: 1px solid #333;
-        }
-
-        .new-chat-btn {
-            margin: 15px;
-            padding: 12px;
-            background-color: var(--accent-dark);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: bold;
-        }
-
-        .new-chat-btn:hover {
-            background-color: var(--accent-color);
-            color: var(--bg-color);
-        }
-
-        .chat-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            list-style: none;
-        }
-
-        .chat-list li {
-            padding: 15px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #2a3644;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            transition: background 0.2s;
+            gap: 10px;
         }
 
-        .chat-list li:hover {
-            background-color: #2a3644;
-        }
-
-        .chat-list li.active {
-            background-color: #2a3644;
-            border-left: 4px solid var(--accent-color);
-        }
-
-        .chat-title {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 80%;
-        }
-
-        .delete-chat {
-            color: var(--red);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-        }
-
-        /* --- HAUPTBEREICH --- */
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .top-bar {
-            padding: 15px 25px;
-            background-color: var(--card-bg);
-            border-bottom: 1px solid #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .top-controls {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
+        .streak-fire { color: #e74c3c; }
 
         .settings-btn {
             background: none;
@@ -144,142 +68,180 @@
             transition: 0.2s;
         }
 
-        .settings-btn:hover {
-            color: var(--accent-color);
+        /* --- COLLAPSIBLE MENUS (Auf- und Zuschieben) --- */
+        .control-panel {
+            background-color: var(--bg-color);
+            z-index: 90;
+            overflow-y: auto;
+            max-height: 40vh; /* Nimmt maximal 40% des Screens ein, wenn offen */
         }
 
-        select {
-            background-color: var(--bg-color);
+        .accordion {
+            background-color: var(--card-bg);
             color: var(--text-main);
-            border: 1px solid #444;
-            padding: 8px 12px;
-            border-radius: 5px;
-            font-size: 0.9rem;
             cursor: pointer;
-        }
-
-        /* --- VOKABELSPEICHER --- */
-        .vocab-panel {
-            padding: 15px 25px;
-            background-color: #151a22;
-            border-bottom: 1px solid #333;
-        }
-
-        .vocab-panel label {
-            font-size: 0.9rem;
-            color: var(--accent-dark);
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .vocab-panel textarea {
+            padding: 15px 20px;
             width: 100%;
-            height: 60px;
+            text-align: left;
+            border: none;
+            border-bottom: 1px solid #333;
+            outline: none;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion:after {
+            content: '\f078'; /* FontAwesome Chevron Down */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .accordion.active:after {
+            transform: rotate(180deg);
+        }
+
+        .panel {
+            padding: 0 20px;
+            background-color: #11151c;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .panel-content {
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Inputs in Panels */
+        select, textarea {
+            width: 100%;
             background-color: var(--bg-color);
             color: var(--text-main);
             border: 1px solid #444;
+            padding: 12px;
             border-radius: 8px;
-            padding: 10px;
-            resize: none;
+            font-size: 1rem;
         }
 
-        /* --- CHAT FENSTER --- */
+        textarea { height: 80px; resize: none; }
+
+        .btn-primary {
+            background-color: var(--accent-dark);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .history-list { list-style: none; }
+        .history-list li {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-list button {
+            background: none; border: none; color: var(--accent-color); font-size: 1.2rem; cursor: pointer;
+        }
+
+        /* --- CHAT AREA --- */
         .chat-window {
             flex-grow: 1;
-            padding: 25px;
+            padding: 20px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            padding-bottom: 120px; /* Platz für den fixierten Mikrofon-Button */
         }
 
-        .message-container {
-            display: flex;
-            flex-direction: column;
-            max-width: 80%;
-        }
-
-        .msg-user-wrapper {
-            align-self: flex-end;
-            align-items: flex-end;
-        }
-
-        .msg-ai-wrapper {
-            align-self: flex-start;
-            align-items: flex-start;
-        }
+        .message-container { display: flex; flex-direction: column; max-width: 85%; }
+        .msg-user-wrapper { align-self: flex-end; align-items: flex-end; }
+        .msg-ai-wrapper { align-self: flex-start; align-items: flex-start; }
 
         .message-bubble {
-            padding: 15px 20px;
-            border-radius: 12px;
-            line-height: 1.5;
-            font-size: 1.1rem;
+            padding: 12px 18px;
+            border-radius: 18px;
+            line-height: 1.4;
+            font-size: 1.05rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .msg-user {
             background-color: var(--accent-dark);
             color: #fff;
-            border-bottom-right-radius: 2px;
+            border-bottom-right-radius: 4px;
         }
 
         .msg-ai {
             background-color: var(--card-bg);
             border: 1px solid #333;
-            border-bottom-left-radius: 2px;
+            border-bottom-left-radius: 4px;
         }
 
-        /* --- LEHRER FEEDBACK BOX --- */
+        /* 3-Stufen-Lehrer-Feedback */
         .feedback-box {
             margin-top: 5px;
-            padding: 10px 15px;
+            padding: 10px 12px;
             border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 500;
+            font-size: 0.9rem;
             max-width: 100%;
             display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .feedback-green { background-color: rgba(46, 204, 113, 0.15); border: 1px solid var(--green); color: var(--green); }
+        .feedback-yellow { background-color: rgba(241, 196, 15, 0.15); border: 1px solid var(--yellow); color: var(--yellow); }
+        .feedback-red { background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--red); color: var(--red); }
+
+        /* --- SCHWEBENDER MIKROFON-BUTTON (iPhone Style) --- */
+        .floating-mic-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             gap: 10px;
         }
 
-        .feedback-green { background-color: rgba(46, 204, 113, 0.2); border: 1px solid var(--green); color: var(--green); }
-        .feedback-yellow { background-color: rgba(241, 196, 15, 0.2); border: 1px solid var(--yellow); color: var(--yellow); }
-        .feedback-red { background-color: rgba(231, 76, 60, 0.2); border: 1px solid var(--red); color: var(--red); }
-
-        /* --- MIKROFON BEREICH --- */
-        .action-bar {
-            padding: 25px;
-            background-color: var(--card-bg);
-            border-top: 1px solid #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
         .mic-btn {
-            width: 75px;
-            height: 75px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             background-color: var(--accent-color);
-            color: #000;
+            color: var(--bg-color);
             border: none;
             font-size: 2rem;
             cursor: pointer;
-            box-shadow: 0 0 15px var(--accent-color);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 252, 241, 0.4);
             display: flex;
             justify-content: center;
             align-items: center;
+            transition: 0.2s;
         }
 
-        .mic-btn:hover {
-            transform: scale(1.05);
-        }
-
+        .mic-btn:active { transform: scale(0.95); }
         .mic-btn.recording {
             background-color: var(--red);
-            box-shadow: 0 0 25px var(--red);
             color: white;
+            box-shadow: 0 0 20px var(--red);
             animation: pulse 1.5s infinite;
         }
 
@@ -294,449 +256,350 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.85);
+            background-color: rgba(11, 12, 16, 0.95);
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
-
         .modal-content {
             background-color: var(--card-bg);
-            padding: 35px;
+            padding: 30px;
             border-radius: 12px;
             width: 90%;
             max-width: 400px;
-            text-align: center;
-            border: 1px solid #333;
-        }
-
-        .modal-content h3 {
-            color: var(--accent-color);
-            margin-bottom: 20px;
-        }
-
-        .modal-content input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            background-color: var(--bg-color);
             border: 1px solid #444;
-            color: white;
-            border-radius: 5px;
-        }
-
-        .modal-content button {
-            padding: 12px 25px;
-            background-color: var(--accent-dark);
-            border: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-        
-        .loading-indicator {
-            display: none;
-            color: var(--accent-color);
             text-align: center;
-            padding: 10px;
-            font-weight: bold;
         }
+        .modal-content h3 { color: var(--accent-color); margin-bottom: 15px; }
+        .modal-content input { width: 100%; padding: 12px; margin-bottom: 20px; background-color: var(--bg-color); border: 1px solid #555; color: white; border-radius: 8px;}
+        .loading-text { color: var(--accent-color); font-size: 0.9rem; font-weight: bold; text-align: center; display: none; }
+        
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <i class="fas fa-comments"></i> Hablamos
+    <div class="top-bar">
+        <div class="logo">
+            <i class="fas fa-fire streak-fire"></i> <span id="streakCounter">0</span> | Hablamos
         </div>
-        <button class="new-chat-btn" onclick="createNewChat()">
-            <i class="fas fa-plus"></i> Neuer Call
-        </button>
-        <ul class="chat-list" id="chatList">
-            </ul>
+        <button class="settings-btn" onclick="openVault()"><i class="fas fa-cog"></i></button>
     </div>
 
-    <div class="main-content">
-        <div class="top-bar">
-            <div class="top-controls">
-                <select id="difficultySelect" onchange="saveSettings()">
-                    <option value="leicht">🟢 Leicht (Kurze Sätze)</option>
-                    <option value="mittel" selected>🟡 Mittel (Normal)</option>
+    <div class="control-panel">
+        <button class="accordion"><i class="fas fa-book-open"></i> Training Setup</button>
+        <div class="panel">
+            <div class="panel-content">
+                <select id="diffSelect">
+                    <option value="leicht">🟢 Leicht (Kurz & Simpel)</option>
+                    <option value="mittel" selected>🟡 Mittel (Normaler Flow)</option>
                     <option value="schwer">🔴 Schwer (Komplex)</option>
                 </select>
+                <textarea id="vocabInput" placeholder="Spanische Wörter hier eingeben (Komma getrennt)..."></textarea>
+                <button class="btn-primary" onclick="startNewCall()">Neuen Call starten</button>
             </div>
-            <button class="settings-btn" onclick="openModal()" title="API Tresor">
-                <i class="fas fa-cog"></i>
-            </button>
         </div>
 
-        <div class="vocab-panel">
-            <label for="vocabInput"><i class="fas fa-book"></i> Mein Wortschatz (Komma getrennt)</label>
-            <textarea id="vocabInput" placeholder="hola, yo, soy, perro, gato..."></textarea>
-        </div>
-
-        <div class="chat-window" id="chatWindow">
+        <button class="accordion"><i class="fas fa-history"></i> Chat Archiv</button>
+        <div class="panel">
+            <div class="panel-content">
+                <ul class="history-list" id="historyList">
+                    </ul>
             </div>
-        
-        <div class="loading-indicator" id="loadingIndicator">KI denkt nach...</div>
-
-        <div class="action-bar">
-            <button class="mic-btn" id="micBtn" onclick="toggleRecording()">
-                <i class="fas fa-microphone"></i>
-            </button>
         </div>
     </div>
 
-    <div class="modal" id="apiModal">
+    <div class="chat-window" id="chatWindow">
+        <div style="text-align:center; color:#777; margin-top:20px;">Wähle oben dein Setup und drücke das Mikrofon!</div>
+    </div>
+
+    <div class="floating-mic-container">
+        <div class="loading-text" id="loadingText">Denkt nach...</div>
+        <button class="mic-btn" id="micBtn" onclick="toggleRecording()">
+            <i class="fas fa-microphone"></i>
+        </button>
+    </div>
+
+    <div class="modal" id="vaultModal">
         <div class="modal-content">
-            <h3><i class="fas fa-key"></i> Groq API Tresor</h3>
-            <p style="margin-bottom: 15px; font-size: 0.9rem;">Dein Key wird nur lokal auf dem Handy gespeichert.</p>
-            <input type="password" id="apiKeyInput" placeholder="gsk_...">
-            <button onclick="saveApiKey()">Speichern & Schließen</button>
+            <h3><i class="fas fa-lock"></i> API Tresor</h3>
+            <p style="margin-bottom: 15px; font-size: 0.85rem; color:#aaa;">Dein Groq Key bleibt nur auf diesem Gerät.</p>
+            <input type="password" id="keyInput" placeholder="gsk_...">
+            <button class="btn-primary" onclick="saveKey()">Speichern</button>
         </div>
     </div>
 
     <script>
-        // DOM Elemente
+        // DOM Elements
         const chatWindow = document.getElementById('chatWindow');
-        const chatList = document.getElementById('chatList');
         const vocabInput = document.getElementById('vocabInput');
-        const difficultySelect = document.getElementById('difficultySelect');
+        const diffSelect = document.getElementById('diffSelect');
         const micBtn = document.getElementById('micBtn');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const apiModal = document.getElementById('apiModal');
-        const apiKeyInput = document.getElementById('apiKeyInput');
-
-        // State & Daten
-        let chats = JSON.parse(localStorage.getItem('hablamos_chats')) || {};
-        let currentChatId = localStorage.getItem('hablamos_current_chat') || null;
+        const loadingText = document.getElementById('loadingText');
+        const vaultModal = document.getElementById('vaultModal');
+        const streakCounter = document.getElementById('streakCounter');
+        
+        // State
         let isRecording = false;
         let recognition = null;
         let synth = window.speechSynthesis;
-
-        // --- INITIALISIERUNG ---
-        window.onload = () => {
-            // Lade Vokabeln & Einstellungen
-            vocabInput.value = localStorage.getItem('hablamos_vocab') || '';
-            const savedDiff = localStorage.getItem('hablamos_difficulty');
-            if(savedDiff) difficultySelect.value = savedDiff;
-
-            // Vokabeln automatisch bei Eingabe speichern
-            vocabInput.addEventListener('input', () => {
-                localStorage.setItem('hablamos_vocab', vocabInput.value);
-            });
-
-            // Chats initialisieren
-            if (Object.keys(chats).length === 0) {
-                createNewChat();
-            } else {
-                if (!currentChatId || !chats[currentChatId]) {
-                    currentChatId = Object.keys(chats)[0];
+        let currentMessages = [];
+        let pastChats = JSON.parse(localStorage.getItem('hablamos_chats')) || [];
+        
+        // Akkordeon Logik (Auf- und Zuschieben)
+        var acc = document.getElementsByClassName("accordion");
+        for (let i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
                 }
-                renderChatList();
-                renderChatMessages();
-            }
+            });
+        }
 
-            setupSpeechRecognition();
+        // Init
+        window.onload = () => {
+            vocabInput.value = localStorage.getItem('hablamos_vocab') || '';
+            vocabInput.addEventListener('input', () => localStorage.setItem('hablamos_vocab', vocabInput.value));
+            diffSelect.value = localStorage.getItem('hablamos_diff') || 'mittel';
+            diffSelect.addEventListener('change', () => localStorage.setItem('hablamos_diff', diffSelect.value));
+            
+            updateStreak();
+            renderHistory();
+            setupMic();
         };
 
-        // --- MULTI-CHAT SYSTEM ---
-        function createNewChat() {
-            const id = 'chat_' + Date.now();
-            chats[id] = {
-                title: 'Neuer Call ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                messages: []
-            };
-            currentChatId = id;
-            saveChatsData();
-            renderChatList();
-            renderChatMessages();
-        }
-
-        function switchChat(id) {
-            currentChatId = id;
-            localStorage.setItem('hablamos_current_chat', id);
-            renderChatList();
-            renderChatMessages();
-        }
-
-        function deleteChat(event, id) {
-            event.stopPropagation();
-            delete chats[id];
+        // Streak System
+        function updateStreak() {
+            let lastDate = localStorage.getItem('hablamos_last_date');
+            let streak = parseInt(localStorage.getItem('hablamos_streak') || '0');
+            let today = new Date().toDateString();
             
-            if (Object.keys(chats).length === 0) {
-                createNewChat();
-            } else if (currentChatId === id) {
-                currentChatId = Object.keys(chats)[0];
+            if (lastDate !== today) {
+                if (lastDate === new Date(Date.now() - 86400000).toDateString()) {
+                    streak++; 
+                } else if (lastDate) {
+                    streak = 1; 
+                } else {
+                    streak = 1;
+                }
+                localStorage.setItem('hablamos_last_date', today);
+                localStorage.setItem('hablamos_streak', streak);
             }
-            saveChatsData();
-            renderChatList();
-            renderChatMessages();
+            streakCounter.innerText = streak;
         }
 
-        function saveChatsData() {
-            localStorage.setItem('hablamos_chats', JSON.stringify(chats));
-            localStorage.setItem('hablamos_current_chat', currentChatId);
+        // Vault Logic (No hardcoded keys)
+        function openVault() {
+            document.getElementById('keyInput').value = localStorage.getItem('hablamos_groq_key') || '';
+            vaultModal.style.display = 'flex';
+        }
+        function saveKey() {
+            localStorage.setItem('hablamos_groq_key', document.getElementById('keyInput').value.trim());
+            vaultModal.style.display = 'none';
         }
 
-        function renderChatList() {
-            chatList.innerHTML = '';
-            for (const [id, chatData] of Object.entries(chats)) {
-                const li = document.createElement('li');
-                if (id === currentChatId) li.className = 'active';
-                li.onclick = () => switchChat(id);
-                
-                li.innerHTML = `
-                    <span class="chat-title">${chatData.title}</span>
-                    <button class="delete-chat" onclick="deleteChat(event, '${id}')"><i class="fas fa-trash"></i></button>
-                `;
-                chatList.appendChild(li);
-            }
-        }
-
-        // --- CHAT RENDERING ---
-        function renderChatMessages() {
+        // Chat Management
+        function startNewCall() {
+            if(currentMessages.length > 2) saveCurrentChat();
+            currentMessages = [];
             chatWindow.innerHTML = '';
-            const messages = chats[currentChatId].messages;
-            
-            if(messages.length === 0) {
-                chatWindow.innerHTML = '<div style="text-align:center; color:#777; margin-top:50px;">Drücke das Mikrofon und starte das Gespräch auf Spanisch!</div>';
-                return;
+            // Close Accordions automatically
+            for (let i = 0; i < acc.length; i++) {
+                acc[i].classList.remove("active");
+                acc[i].nextElementSibling.style.maxHeight = null;
             }
+            triggerAIStart();
+        }
 
-            messages.forEach(msg => {
-                if (msg.role === 'user') {
-                    appendUserMessageHTML(msg.text, msg.feedback);
-                } else if (msg.role === 'ai') {
-                    appendAIMessageHTML(msg.text);
-                }
+        function saveCurrentChat() {
+            if(currentMessages.length < 3) return;
+            const title = new Date().toLocaleString([], {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+            pastChats.unshift({ title: title, messages: currentMessages });
+            localStorage.setItem('hablamos_chats', JSON.stringify(pastChats));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            pastChats.forEach((chat, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${chat.title}</span> <button onclick="resumeChat(${index})"><i class="fas fa-play-circle"></i></button>`;
+                list.appendChild(li);
             });
-            scrollToBottom();
         }
 
-        function appendUserMessageHTML(text, feedbackObj) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'message-container msg-user-wrapper';
+        function resumeChat(index) {
+            currentMessages = pastChats[index].messages;
+            pastChats.splice(index, 1);
+            localStorage.setItem('hablamos_chats', JSON.stringify(pastChats));
+            renderHistory();
+            rebuildChatUI();
             
-            let html = `<div class="message-bubble msg-user">${text}</div>`;
-            
-            // 3-Stufen-Lehrer-Feedback rendern
-            if (feedbackObj) {
-                let fbClass = 'feedback-green';
-                let icon = '<i class="fas fa-check-circle"></i>';
-                
-                if (feedbackObj.status === 'yellow') {
-                    fbClass = 'feedback-yellow';
-                    icon = '<i class="fas fa-exclamation-triangle"></i>';
-                } else if (feedbackObj.status === 'red') {
-                    fbClass = 'feedback-red';
-                    icon = '<i class="fas fa-times-circle"></i>';
-                }
-                
-                html += `<div class="feedback-box ${fbClass}">${icon} ${feedbackObj.text}</div>`;
+            // Close accordions
+            for (let i = 0; i < acc.length; i++) {
+                acc[i].classList.remove("active");
+                acc[i].nextElementSibling.style.maxHeight = null;
             }
-            
-            wrapper.innerHTML = html;
-            chatWindow.appendChild(wrapper);
-            scrollToBottom();
         }
 
-        function appendAIMessageHTML(text) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'message-container msg-ai-wrapper';
-            wrapper.innerHTML = `<div class="message-bubble msg-ai">${text}</div>`;
-            chatWindow.appendChild(wrapper);
-            scrollToBottom();
+        function rebuildChatUI() {
+            chatWindow.innerHTML = '';
+            currentMessages.forEach(msg => {
+                if(msg.role === 'user') appendUserHTML(msg.content, msg.feedback);
+                if(msg.role === 'assistant') appendAIHTML(msg.content);
+            });
         }
 
-        function scrollToBottom() {
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-
-        // --- SPRACHERKENNUNG (Web Speech API) ---
-        function setupSpeechRecognition() {
+        // Web Speech API (Microphone)
+        function setupMic() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                alert("Dein Browser unterstützt die Spracherkennung leider nicht. Bitte nutze Chrome oder Edge.");
-                return;
-            }
-            
+            if(!SpeechRecognition) return alert("Browser unterstützt kein Web-Mic. Nutze Safari/Chrome.");
             recognition = new SpeechRecognition();
-            recognition.lang = 'es-ES'; 
+            recognition.lang = 'es-ES';
             recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
-
-            recognition.onstart = () => {
-                isRecording = true;
-                micBtn.classList.add('recording');
-            };
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                handleUserVoiceInput(transcript);
-            };
-
-            recognition.onerror = (event) => {
-                console.error("Spracherkennungs-Fehler:", event.error);
-                stopRecordingUI();
-            };
-
-            recognition.onend = () => {
-                stopRecordingUI();
-            };
+            
+            recognition.onstart = () => { isRecording = true; micBtn.classList.add('recording'); synth.cancel(); };
+            recognition.onresult = (e) => processUserInput(e.results[0][0].transcript);
+            recognition.onerror = () => stopMicUI();
+            recognition.onend = () => stopMicUI();
         }
 
         function toggleRecording() {
-            if (!recognition) return;
+            const key = localStorage.getItem('hablamos_groq_key');
+            if(!key) { openVault(); return alert("Bitte trage zuerst deinen Groq-Key im Tresor ein."); }
+            isRecording ? recognition.stop() : recognition.start();
+        }
+        function stopMicUI() { isRecording = false; micBtn.classList.remove('recording'); }
+
+        // Groq AI Logic (JSON Mode)
+        async function processUserInput(text) {
+            loadingText.style.display = 'block';
+            appendUserHTML(text, null); // Temporär ohne Feedback anzeigen
+
+            const key = localStorage.getItem('hablamos_groq_key');
+            const vocab = vocabInput.value.trim() || 'hola, sí, no';
+            const diff = diffSelect.value;
             
-            if (isRecording) {
-                recognition.stop();
-            } else {
-                // Audioausgabe stoppen, falls sie noch redet
-                synth.cancel(); 
-                recognition.start();
-            }
-        }
-
-        function stopRecordingUI() {
-            isRecording = false;
-            micBtn.classList.remove('recording');
-        }
-
-        // --- CORE LOGIK: GROQ API CALL ---
-        async function handleUserVoiceInput(transcript) {
-            const apiKey = localStorage.getItem('hablamos_groq_key');
-            if (!apiKey) {
-                openModal();
-                alert("Bitte trage zuerst deinen Groq API Key ein!");
-                return;
-            }
-
-            loadingIndicator.style.display = 'block';
-
-            // Groq API Call mit strengem JSON Mode für Lehrer + Antwort
-            try {
-                const difficulty = difficultySelect.value;
-                const vocab = vocabInput.value.trim();
-                
-                const systemPrompt = `
-Du bist ein Spanisch-Lehrer und Gesprächspartner.
-SCHWIERIGKEITSGRAD: ${difficulty}. (Leicht=kurze Sätze, Schwer=komplexer).
-ERLAUBTE VOKABELN (Absolutes Verbot für andere Hauptwörter): ${vocab || 'Normale Konversation'}.
-
-ANTI-ECHO REGEL: Wiederhole niemals einfach den Satz des Users! Du MUSST eine völlig neue inhaltliche Frage stellen.
-
-GIB DEINE ANTWORT ZWINGEND IM FOLGENDEN JSON FORMAT ZURÜCK:
+            const sysPrompt = `
+Du bist ein Spanisch-Lehrer. Schwierigkeit: ${diff}.
+ERLAUBTE VOKABELN: ${vocab}. BENUTZE NIEMALS ANDERE WÖRTER!
+ANTI-ECHO: Wiederhole niemals den User. Stelle zwingend EINE neue Frage.
+ANTWORTE NUR IN DIESEM JSON FORMAT:
 {
   "feedback": {
-    "status": "green", // green (perfekt), yellow (kleiner Grammatikfehler), red (komplett falsch/unverständlich)
-    "text": "Dein kurzes deutsches Lehrer-Feedback zur Grammatik des Users."
+    "status": "green", // green(perfekt), yellow(kleiner Grammatikfehler), red(falsch)
+    "text": "Kurzes deutsches Feedback zur Grammatik."
   },
-  "reply": "Deine spanische Antwort und neue Frage."
-}
-                `;
+  "reply": "Spanische Antwort."
+}`;
 
-                // Baue die Historie für das Modell auf
-                let messages = [{ role: 'system', content: systemPrompt }];
-                
-                // Letzte 5 Nachrichten aus dem aktuellen Chat als Kontext mitgeben
-                const currentHistory = chats[currentChatId].messages;
-                const recentContext = currentHistory.slice(-5);
-                recentContext.forEach(m => {
-                    messages.push({ role: m.role, content: m.text });
-                });
-                
-                // Die neue User-Nachricht
-                messages.push({ role: 'user', content: transcript });
+            let apiMessages = [{role: "system", content: sysPrompt}];
+            currentMessages.slice(-4).forEach(m => apiMessages.push({role: m.role, content: m.content}));
+            apiMessages.push({role: "user", content: text});
 
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            try {
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
                     body: JSON.stringify({
                         model: 'llama-3.1-8b-instant',
-                        messages: messages,
+                        messages: apiMessages,
                         response_format: { type: "json_object" },
-                        temperature: 0.3,
-                        max_tokens: 250
+                        temperature: 0.3
                     })
                 });
-
-                if (!response.ok) throw new Error("API Limit oder Netzwerkfehler.");
-
-                const data = await response.json();
-                const aiResponseJSON = JSON.parse(data.choices[0].message.content);
                 
-                const feedbackStatus = aiResponseJSON.feedback.status || 'green';
-                const feedbackText = aiResponseJSON.feedback.text || 'Gut gemacht!';
-                const aiReply = aiResponseJSON.reply || 'Lo siento, no entendí.';
-
-                // Speichere in Chat History
-                chats[currentChatId].messages.push({
-                    role: 'user', 
-                    text: transcript,
-                    feedback: { status: feedbackStatus, text: feedbackText }
-                });
+                if(!res.ok) throw new Error("API Limit oder falscher Key");
                 
-                chats[currentChatId].messages.push({
-                    role: 'ai',
-                    text: aiReply
-                });
+                const data = await res.json();
+                const jsonRes = JSON.parse(data.choices[0].message.content);
+                
+                // Update letztes User-Objekt mit Feedback
+                chatWindow.lastChild.remove(); // temporäres entfernen
+                appendUserHTML(text, jsonRes.feedback);
+                appendAIHTML(jsonRes.reply);
+                
+                currentMessages.push({role: 'user', content: text, feedback: jsonRes.feedback});
+                currentMessages.push({role: 'assistant', content: jsonRes.reply});
+                
+                speakText(jsonRes.reply);
+                updateStreak();
 
-                // Titel des Chats aktualisieren (erste Nachricht)
-                if (chats[currentChatId].messages.length <= 2) {
-                    chats[currentChatId].title = transcript.substring(0, 20) + '...';
-                }
-
-                saveChatsData();
-                renderChatList();
-                renderChatMessages();
-
-                // Sprachausgabe (TTS)
-                speakSpanish(aiReply);
-
-            } catch (error) {
-                console.error(error);
-                appendAIMessageHTML("⚠️ Verbindungsfehler: Bitte überprüfe deinen API Key oder versuche es nochmal.");
+            } catch (err) {
+                appendAIHTML("⚠️ Error: " + err.message);
             } finally {
-                loadingIndicator.style.display = 'none';
+                loadingText.style.display = 'none';
             }
         }
 
-        // --- SPRACHAUSGABE (TTS) ---
-        function speakSpanish(text) {
-            if (synth.speaking) {
-                console.error('speechSynthesis.speaking');
-                return;
+        async function triggerAIStart() {
+            loadingText.style.display = 'block';
+            const key = localStorage.getItem('hablamos_groq_key');
+            const vocab = vocabInput.value.trim();
+            const words = vocab.split(',').map(w => w.trim()).filter(w => w);
+            const randomWord = words.length > 0 ? words[Math.floor(Math.random() * words.length)] : 'hola';
+            
+            try {
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-8b-instant',
+                        messages: [
+                            {role: "system", content: `Stelle exakt EINE einfache Frage auf Spanisch, die das Wort '${randomWord}' beinhaltet. Nur Spanisch, kein JSON hier.`}
+                        ],
+                        temperature: 0.5,
+                        max_tokens: 50
+                    })
+                });
+                const data = await res.json();
+                const reply = data.choices[0].message.content;
+                appendAIHTML(reply);
+                currentMessages.push({role: 'assistant', content: reply});
+                speakText(reply);
+            } catch(e) {
+                appendAIHTML("⚠️ Bitte API Key überprüfen.");
+            } finally {
+                loadingText.style.display = 'none';
             }
-            const utterThis = new SpeechSynthesisUtterance(text);
-            utterThis.lang = 'es-ES';
-            utterThis.rate = 0.9; // Leicht gedrosseltes Tempo für besseres Verständnis
-            synth.speak(utterThis);
         }
 
-        // --- EINSTELLUNGEN (Tresor) ---
-        function saveSettings() {
-            localStorage.setItem('hablamos_difficulty', difficultySelect.value);
-        }
-
-        function openModal() {
-            apiKeyInput.value = localStorage.getItem('hablamos_groq_key') || '';
-            apiModal.style.display = 'flex';
-        }
-
-        function saveApiKey() {
-            const val = apiKeyInput.value.trim();
-            if(val) {
-                localStorage.setItem('hablamos_groq_key', val);
+        // HTML Builders
+        function appendUserHTML(text, fb) {
+            const wrap = document.createElement('div');
+            wrap.className = 'message-container msg-user-wrapper';
+            let html = `<div class="message-bubble msg-user">${text}</div>`;
+            
+            if(fb) {
+                let colorClass = fb.status === 'green' ? 'feedback-green' : (fb.status === 'yellow' ? 'feedback-yellow' : 'feedback-red');
+                let icon = fb.status === 'green' ? 'check-circle' : (fb.status === 'yellow' ? 'exclamation-triangle' : 'times-circle');
+                html += `<div class="feedback-box ${colorClass}"><i class="fas fa-${icon}"></i> <span>${fb.text}</span></div>`;
             }
-            apiModal.style.display = 'none';
+            
+            wrap.innerHTML = html;
+            chatWindow.appendChild(wrap);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
+        function appendAIHTML(text) {
+            const wrap = document.createElement('div');
+            wrap.className = 'message-container msg-ai-wrapper';
+            wrap.innerHTML = `<div class="message-bubble msg-ai">${text}</div>`;
+            chatWindow.appendChild(wrap);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function speakText(text) {
+            if(synth.speaking) synth.cancel();
+            let utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'es-ES';
+            utter.rate = 0.95;
+            synth.speak(utter);
+        }
     </script>
 </body>
 </html>
