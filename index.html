@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- IRON WILL DESIGN (iPhone Optimized) --- */
+        /* --- DESIGN (iPhone Optimized) --- */
         :root {
             --bg-color: #0b0c10;
             --card-bg: #1f2833;
@@ -48,32 +48,16 @@
             z-index: 100;
         }
 
-        .logo {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .logo { font-size: 1.2rem; font-weight: bold; color: var(--accent-color); display: flex; align-items: center; gap: 10px; }
         .streak-fire { color: #e74c3c; }
+        .settings-btn { background: none; border: none; color: var(--text-main); font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
 
-        .settings-btn {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        /* --- COLLAPSIBLE MENUS (Auf- und Zuschieben) --- */
+        /* --- COLLAPSIBLE MENUS --- */
         .control-panel {
             background-color: var(--bg-color);
             z-index: 90;
             overflow-y: auto;
-            max-height: 40vh; /* Nimmt maximal 40% des Screens ein, wenn offen */
+            max-height: 40vh;
         }
 
         .accordion {
@@ -95,16 +79,14 @@
         }
 
         .accordion:after {
-            content: '\f078'; /* FontAwesome Chevron Down */
+            content: '\f078';
             font-family: "Font Awesome 6 Free";
             font-weight: 900;
             font-size: 0.9rem;
             transition: 0.3s;
         }
 
-        .accordion.active:after {
-            transform: rotate(180deg);
-        }
+        .accordion.active:after { transform: rotate(180deg); }
 
         .panel {
             padding: 0 20px;
@@ -114,14 +96,8 @@
             transition: max-height 0.3s ease-out;
         }
 
-        .panel-content {
-            padding: 15px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .panel-content { padding: 15px 0; display: flex; flex-direction: column; gap: 15px; }
 
-        /* Inputs in Panels */
         select, textarea {
             width: 100%;
             background-color: var(--bg-color);
@@ -154,9 +130,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        .history-list button {
-            background: none; border: none; color: var(--accent-color); font-size: 1.2rem; cursor: pointer;
-        }
+        .history-list button { background: none; border: none; color: var(--accent-color); font-size: 1.2rem; cursor: pointer; }
 
         /* --- CHAT AREA --- */
         .chat-window {
@@ -166,7 +140,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            padding-bottom: 120px; /* Platz für den fixierten Mikrofon-Button */
+            padding-bottom: 120px;
         }
 
         .message-container { display: flex; flex-direction: column; max-width: 85%; }
@@ -181,17 +155,8 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        .msg-user {
-            background-color: var(--accent-dark);
-            color: #fff;
-            border-bottom-right-radius: 4px;
-        }
-
-        .msg-ai {
-            background-color: var(--card-bg);
-            border: 1px solid #333;
-            border-bottom-left-radius: 4px;
-        }
+        .msg-user { background-color: var(--accent-dark); color: #fff; border-bottom-right-radius: 4px; }
+        .msg-ai { background-color: var(--card-bg); border: 1px solid #333; border-bottom-left-radius: 4px; }
 
         /* 3-Stufen-Lehrer-Feedback */
         .feedback-box {
@@ -208,7 +173,7 @@
         .feedback-yellow { background-color: rgba(241, 196, 15, 0.15); border: 1px solid var(--yellow); color: var(--yellow); }
         .feedback-red { background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--red); color: var(--red); }
 
-        /* --- SCHWEBENDER MIKROFON-BUTTON (iPhone Style) --- */
+        /* --- SCHWEBENDER MIKROFON-BUTTON --- */
         .floating-mic-container {
             position: fixed;
             bottom: 30px;
@@ -272,7 +237,7 @@
         }
         .modal-content h3 { color: var(--accent-color); margin-bottom: 15px; }
         .modal-content input { width: 100%; padding: 12px; margin-bottom: 20px; background-color: var(--bg-color); border: 1px solid #555; color: white; border-radius: 8px;}
-        .loading-text { color: var(--accent-color); font-size: 0.9rem; font-weight: bold; text-align: center; display: none; }
+        .loading-text { color: var(--accent-color); font-size: 0.9rem; font-weight: bold; text-align: center; display: none; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 10px;}
         
     </style>
 </head>
@@ -313,7 +278,7 @@
     </div>
 
     <div class="floating-mic-container">
-        <div class="loading-text" id="loadingText">Denkt nach...</div>
+        <div class="loading-text" id="loadingText">Verarbeite Audio...</div>
         <button class="mic-btn" id="micBtn" onclick="toggleRecording()">
             <i class="fas fa-microphone"></i>
         </button>
@@ -339,13 +304,16 @@
         const streakCounter = document.getElementById('streakCounter');
         
         // State
-        let isRecording = false;
-        let recognition = null;
-        let synth = window.speechSynthesis;
         let currentMessages = [];
         let pastChats = JSON.parse(localStorage.getItem('hablamos_chats')) || [];
+        let synth = window.speechSynthesis;
         
-        // Akkordeon Logik (Auf- und Zuschieben)
+        // Audio Recording State
+        let isRecording = false;
+        let mediaRecorder;
+        let audioChunks = [];
+
+        // Akkordeon Logik
         var acc = document.getElementsByClassName("accordion");
         for (let i = 0; i < acc.length; i++) {
             acc[i].addEventListener("click", function() {
@@ -368,7 +336,6 @@
             
             updateStreak();
             renderHistory();
-            setupMic();
         };
 
         // Streak System
@@ -391,7 +358,7 @@
             streakCounter.innerText = streak;
         }
 
-        // Vault Logic (No hardcoded keys)
+        // Vault Logic
         function openVault() {
             document.getElementById('keyInput').value = localStorage.getItem('hablamos_groq_key') || '';
             vaultModal.style.display = 'flex';
@@ -406,7 +373,6 @@
             if(currentMessages.length > 2) saveCurrentChat();
             currentMessages = [];
             chatWindow.innerHTML = '';
-            // Close Accordions automatically
             for (let i = 0; i < acc.length; i++) {
                 acc[i].classList.remove("active");
                 acc[i].nextElementSibling.style.maxHeight = null;
@@ -439,7 +405,6 @@
             renderHistory();
             rebuildChatUI();
             
-            // Close accordions
             for (let i = 0; i < acc.length; i++) {
                 acc[i].classList.remove("active");
                 acc[i].nextElementSibling.style.maxHeight = null;
@@ -454,31 +419,85 @@
             });
         }
 
-        // Web Speech API (Microphone)
-        function setupMic() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SpeechRecognition) return alert("Browser unterstützt kein Web-Mic. Nutze Safari/Chrome.");
-            recognition = new SpeechRecognition();
-            recognition.lang = 'es-ES';
-            recognition.interimResults = false;
-            
-            recognition.onstart = () => { isRecording = true; micBtn.classList.add('recording'); synth.cancel(); };
-            recognition.onresult = (e) => processUserInput(e.results[0][0].transcript);
-            recognition.onerror = () => stopMicUI();
-            recognition.onend = () => stopMicUI();
-        }
-
-        function toggleRecording() {
+        // --- MICROPHONE & WHISPER API (Der Fix für iPhones!) ---
+        async function toggleRecording() {
             const key = localStorage.getItem('hablamos_groq_key');
             if(!key) { openVault(); return alert("Bitte trage zuerst deinen Groq-Key im Tresor ein."); }
-            isRecording ? recognition.stop() : recognition.start();
-        }
-        function stopMicUI() { isRecording = false; micBtn.classList.remove('recording'); }
 
-        // Groq AI Logic (JSON Mode)
-        async function processUserInput(text) {
+            if (isRecording) {
+                // Aufnahme stoppen
+                mediaRecorder.stop();
+                isRecording = false;
+                micBtn.classList.remove('recording');
+            } else {
+                // Aufnahme starten (Web Audio API)
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = sendAudioToWhisper;
+                    
+                    mediaRecorder.start();
+                    isRecording = true;
+                    micBtn.classList.add('recording');
+                    
+                    // iOS Hack: Einmal leeres Audio abspielen, damit Safari die Sprachausgabe später erlaubt
+                    if(synth.speaking) synth.cancel();
+                    let prime = new SpeechSynthesisUtterance("");
+                    synth.speak(prime);
+
+                } catch(err) {
+                    alert("Mikrofon-Zugriff verweigert! Bitte in den Safari/Chrome-Einstellungen erlauben.");
+                }
+            }
+        }
+
+        async function sendAudioToWhisper() {
+            loadingText.innerText = "Transkribiert Stimme...";
             loadingText.style.display = 'block';
-            appendUserHTML(text, null); // Temporär ohne Feedback anzeigen
+            
+            const key = localStorage.getItem('hablamos_groq_key');
+            
+            // Audio Chunk zu Blob zusammenfügen
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); 
+            // Datei für Groq vorbereiten
+            const file = new File([audioBlob], "aufnahme.webm", { type: audioBlob.type });
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("model", "whisper-large-v3-turbo");
+            formData.append("language", "es"); // Zwingt Whisper, Spanisch zu hören
+
+            try {
+                const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${key}` }, // KEIN Content-Type bei FormData!
+                    body: formData
+                });
+                
+                if(!res.ok) throw new Error("API Limit oder falscher Key");
+                
+                const data = await res.json();
+                if(data.text && data.text.trim().length > 0) {
+                    processUserInput(data.text);
+                } else {
+                    loadingText.style.display = 'none';
+                }
+            } catch (err) {
+                alert("Whisper-Fehler: " + err.message);
+                loadingText.style.display = 'none';
+            }
+        }
+
+        // --- GROQ AI LOGIC (LLaMA 3.1 8B JSON MODE) ---
+        async function processUserInput(text) {
+            loadingText.innerText = "Lehrer analysiert...";
+            appendUserHTML(text, null); // Temporär anzeigen ohne Feedback
 
             const key = localStorage.getItem('hablamos_groq_key');
             const vocab = vocabInput.value.trim() || 'hola, sí, no';
@@ -487,14 +506,14 @@
             const sysPrompt = `
 Du bist ein Spanisch-Lehrer. Schwierigkeit: ${diff}.
 ERLAUBTE VOKABELN: ${vocab}. BENUTZE NIEMALS ANDERE WÖRTER!
-ANTI-ECHO: Wiederhole niemals den User. Stelle zwingend EINE neue Frage.
-ANTWORTE NUR IN DIESEM JSON FORMAT:
+ANTI-ECHO: Wiederhole niemals einfach den Satz des Users. Du MUSST zwingend EINE neue inhaltliche Frage stellen.
+GIB DEINE ANTWORT ZWINGEND IM FOLGENDEN JSON FORMAT ZURÜCK:
 {
   "feedback": {
-    "status": "green", // green(perfekt), yellow(kleiner Grammatikfehler), red(falsch)
-    "text": "Kurzes deutsches Feedback zur Grammatik."
+    "status": "green", // green (perfekt), yellow (kleiner Grammatikfehler), red (falsch)
+    "text": "Kurzes deutsches Feedback zur Grammatik des Users."
   },
-  "reply": "Spanische Antwort."
+  "reply": "Spanische Antwort und neue Frage."
 }`;
 
             let apiMessages = [{role: "system", content: sysPrompt}];
@@ -518,8 +537,8 @@ ANTWORTE NUR IN DIESEM JSON FORMAT:
                 const data = await res.json();
                 const jsonRes = JSON.parse(data.choices[0].message.content);
                 
-                // Update letztes User-Objekt mit Feedback
-                chatWindow.lastChild.remove(); // temporäres entfernen
+                // Temporäres Textfeld löschen und finalen Text mit Lehrer-Feedback aufbauen
+                chatWindow.lastChild.remove(); 
                 appendUserHTML(text, jsonRes.feedback);
                 appendAIHTML(jsonRes.reply);
                 
@@ -537,6 +556,7 @@ ANTWORTE NUR IN DIESEM JSON FORMAT:
         }
 
         async function triggerAIStart() {
+            loadingText.innerText = "Startet...";
             loadingText.style.display = 'block';
             const key = localStorage.getItem('hablamos_groq_key');
             const vocab = vocabInput.value.trim();
@@ -568,7 +588,7 @@ ANTWORTE NUR IN DIESEM JSON FORMAT:
             }
         }
 
-        // HTML Builders
+        // --- HTML BUILDER & TTS ---
         function appendUserHTML(text, fb) {
             const wrap = document.createElement('div');
             wrap.className = 'message-container msg-user-wrapper';
