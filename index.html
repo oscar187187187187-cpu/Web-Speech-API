@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hablamos - KI Coach</title>
+    <!-- FontAwesome für Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -243,6 +244,7 @@
 </head>
 <body>
 
+    <!-- Header -->
     <div class="top-bar">
         <div class="logo">
             <i class="fas fa-fire streak-fire"></i> <span id="streakCounter">0</span> | Hablamos
@@ -250,6 +252,7 @@
         <button class="settings-btn" onclick="openVault()"><i class="fas fa-cog"></i></button>
     </div>
 
+    <!-- Akkordeon Menüs -->
     <div class="control-panel">
         <button class="accordion"><i class="fas fa-book-open"></i> Training Setup</button>
         <div class="panel">
@@ -268,15 +271,18 @@
         <div class="panel">
             <div class="panel-content">
                 <ul class="history-list" id="historyList">
-                    </ul>
+                    <!-- Alte Chats laden hier -->
+                </ul>
             </div>
         </div>
     </div>
 
+    <!-- Chat Bereich -->
     <div class="chat-window" id="chatWindow">
         <div style="text-align:center; color:#777; margin-top:20px;">Wähle oben dein Setup und drücke das Mikrofon!</div>
     </div>
 
+    <!-- Fixierter Mikrofon-Button -->
     <div class="floating-mic-container">
         <div class="loading-text" id="loadingText">Verarbeite Audio...</div>
         <button class="mic-btn" id="micBtn" onclick="toggleRecording()">
@@ -284,6 +290,7 @@
         </button>
     </div>
 
+    <!-- API Tresor -->
     <div class="modal" id="vaultModal">
         <div class="modal-content">
             <h3><i class="fas fa-lock"></i> API Tresor</h3>
@@ -293,6 +300,7 @@
         </div>
     </div>
 
+    <!-- JAVASCRIPT LOGIK -->
     <script>
         // DOM Elements
         const chatWindow = document.getElementById('chatWindow');
@@ -419,21 +427,19 @@
             });
         }
 
-        // --- MICROPHONE & WHISPER API (Der Fix für iPhones!) ---
+        // --- MICROPHONE & WHISPER API (Mit erzwungener spanischer Erkennung) ---
         async function toggleRecording() {
             const key = localStorage.getItem('hablamos_groq_key');
             if(!key) { openVault(); return alert("Bitte trage zuerst deinen Groq-Key im Tresor ein."); }
 
             if (isRecording) {
-                // Aufnahme stoppen
                 mediaRecorder.stop();
                 isRecording = false;
                 micBtn.classList.remove('recording');
             } else {
-                // Aufnahme starten (Web Audio API)
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
                     audioChunks = [];
 
                     mediaRecorder.ondataavailable = event => {
@@ -446,7 +452,7 @@
                     isRecording = true;
                     micBtn.classList.add('recording');
                     
-                    // iOS Hack: Einmal leeres Audio abspielen, damit Safari die Sprachausgabe später erlaubt
+                    // iOS Audio-Engine priming
                     if(synth.speaking) synth.cancel();
                     let prime = new SpeechSynthesisUtterance("");
                     synth.speak(prime);
@@ -458,25 +464,23 @@
         }
 
         async function sendAudioToWhisper() {
-            loadingText.innerText = "Transkribiert Stimme...";
+            loadingText.innerText = "Transkribiere Spanisch...";
             loadingText.style.display = 'block';
             
             const key = localStorage.getItem('hablamos_groq_key');
             
-            // Audio Chunk zu Blob zusammenfügen
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); 
-            // Datei für Groq vorbereiten
             const file = new File([audioBlob], "aufnahme.webm", { type: audioBlob.type });
 
             const formData = new FormData();
             formData.append("file", file);
             formData.append("model", "whisper-large-v3-turbo");
-            formData.append("language", "es"); // Zwingt Whisper, Spanisch zu hören
+            formData.append("language", "es"); // Zwingt Whisper, nach spanischen Wörtern zu lauschen (höhere Trefferquote!)
 
             try {
                 const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
                     method: 'POST',
-                    headers: { 'Authorization': `Bearer ${key}` }, // KEIN Content-Type bei FormData!
+                    headers: { 'Authorization': `Bearer ${key}` },
                     body: formData
                 });
                 
@@ -494,10 +498,10 @@
             }
         }
 
-        // --- GROQ AI LOGIC (LLaMA 3.1 8B JSON MODE) ---
+        // --- GROQ AI LOGIC (LLaMA 3.1 8B JSON MODE + Deutsches Feedback) ---
         async function processUserInput(text) {
             loadingText.innerText = "Lehrer analysiert...";
-            appendUserHTML(text, null); // Temporär anzeigen ohne Feedback
+            appendUserHTML(text, null); 
 
             const key = localStorage.getItem('hablamos_groq_key');
             const vocab = vocabInput.value.trim() || 'hola, sí, no';
@@ -511,7 +515,7 @@ GIB DEINE ANTWORT ZWINGEND IM FOLGENDEN JSON FORMAT ZURÜCK:
 {
   "feedback": {
     "status": "green", // green (perfekt), yellow (kleiner Grammatikfehler), red (falsch)
-    "text": "Kurzes deutsches Feedback zur Grammatik des Users."
+    "text": "HIER KOMMT DAS DEUTSCHE FEEDBACK. Erkläre dem User auf Deutsch (z.B. 'Super Satz!', 'Fast richtig, aber...') wie seine Grammatik war."
   },
   "reply": "Spanische Antwort und neue Frage."
 }`;
@@ -537,7 +541,6 @@ GIB DEINE ANTWORT ZWINGEND IM FOLGENDEN JSON FORMAT ZURÜCK:
                 const data = await res.json();
                 const jsonRes = JSON.parse(data.choices[0].message.content);
                 
-                // Temporäres Textfeld löschen und finalen Text mit Lehrer-Feedback aufbauen
                 chatWindow.lastChild.remove(); 
                 appendUserHTML(text, jsonRes.feedback);
                 appendAIHTML(jsonRes.reply);
