@@ -99,7 +99,7 @@
 
         .panel-content { padding: 15px 0; display: flex; flex-direction: column; gap: 15px; }
 
-        select, textarea {
+        select, .panel-content textarea {
             width: 100%;
             background-color: var(--bg-color);
             color: var(--text-main);
@@ -109,7 +109,7 @@
             font-size: 1rem;
         }
 
-        textarea { height: 80px; resize: none; }
+        .panel-content textarea { height: 80px; resize: none; }
 
         .btn-primary {
             background-color: var(--accent-dark);
@@ -141,7 +141,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            padding-bottom: 120px;
+            padding-bottom: 110px;
         }
 
         .message-container { display: flex; flex-direction: column; max-width: 85%; }
@@ -174,46 +174,80 @@
         .feedback-yellow { background-color: rgba(241, 196, 15, 0.15); border: 1px solid var(--yellow); color: var(--yellow); }
         .feedback-red { background-color: rgba(231, 76, 60, 0.15); border: 1px solid var(--red); color: var(--red); }
 
-        /* --- SCHWEBENDER MIKROFON-BUTTON --- */
-        .floating-mic-container {
+        /* --- INPUT BAR (SCHREIBEN & MIKROFON GEMINI-STYLE) --- */
+        .input-bar-container {
             position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-top: 1px solid #333;
+            padding: 12px 16px;
             display: flex;
             flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .input-wrapper {
+            display: flex;
             align-items: center;
+            background-color: var(--bg-color);
+            border: 1px solid #444;
+            border-radius: 25px;
+            padding: 5px 8px 5px 16px;
             gap: 10px;
         }
 
-        .mic-btn {
-            width: 70px;
-            height: 70px;
+        .text-input {
+            flex-grow: 1;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            padding: 8px 0;
+        }
+
+        .send-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mic-btn-inline {
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             background-color: var(--accent-color);
             color: var(--bg-color);
             border: none;
-            font-size: 2rem;
+            font-size: 1.2rem;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(102, 252, 241, 0.4);
             display: flex;
             justify-content: center;
             align-items: center;
             transition: 0.2s;
+            flex-shrink: 0;
         }
 
-        .mic-btn:active { transform: scale(0.95); }
-        .mic-btn.recording {
+        .mic-btn-inline:active { transform: scale(0.95); }
+        .mic-btn-inline.recording {
             background-color: var(--red);
             color: white;
-            box-shadow: 0 0 20px var(--red);
+            box-shadow: 0 0 15px var(--red);
             animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.08); }
             100% { transform: scale(1); }
         }
 
@@ -238,7 +272,7 @@
         }
         .modal-content h3 { color: var(--accent-color); margin-bottom: 15px; }
         .modal-content input { width: 100%; padding: 12px; margin-bottom: 20px; background-color: var(--bg-color); border: 1px solid #555; color: white; border-radius: 8px;}
-        .loading-text { color: var(--accent-color); font-size: 0.9rem; font-weight: bold; text-align: center; display: none; background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 10px;}
+        .loading-text { color: var(--accent-color); font-size: 0.85rem; font-weight: bold; text-align: center; display: none; }
         
     </style>
 </head>
@@ -279,15 +313,21 @@
 
     <!-- Chat Bereich -->
     <div class="chat-window" id="chatWindow">
-        <div style="text-align:center; color:#777; margin-top:20px;">Wähle oben dein Setup und drücke das Mikrofon!</div>
+        <div style="text-align:center; color:#777; margin-top:20px;">Wähle oben dein Setup und starte das Gespräch!</div>
     </div>
 
-    <!-- Fixierter Mikrofon-Button -->
-    <div class="floating-mic-container">
+    <!-- EINGABELEISTE (Schreiben + Mikrofon) -->
+    <div class="input-bar-container">
         <div class="loading-text" id="loadingText">Verarbeite Audio...</div>
-        <button class="mic-btn" id="micBtn" onclick="toggleRecording()">
-            <i class="fas fa-microphone"></i>
-        </button>
+        <div class="input-wrapper">
+            <input type="text" id="textInput" class="text-input" placeholder="Schreibe auf Spanisch..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendTextMessage()" title="Senden">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+            <button class="mic-btn-inline" id="micBtn" onclick="toggleRecording()" title="Einsprechen">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
     </div>
 
     <!-- API Tresor -->
@@ -306,6 +346,7 @@
         const chatWindow = document.getElementById('chatWindow');
         const vocabInput = document.getElementById('vocabInput');
         const diffSelect = document.getElementById('diffSelect');
+        const textInput = document.getElementById('textInput');
         const micBtn = document.getElementById('micBtn');
         const loadingText = document.getElementById('loadingText');
         const vaultModal = document.getElementById('vaultModal');
@@ -427,7 +468,22 @@
             });
         }
 
-        // --- MICROPHONE & WHISPER API (Mit erzwungener spanischer Erkennung) ---
+        // --- SCHREIB-FUNKTION ---
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendTextMessage();
+            }
+        }
+
+        function sendTextMessage() {
+            const text = textInput.value.trim();
+            if(!text) return;
+            
+            textInput.value = '';
+            processUserInput(text);
+        }
+
+        // --- MICROPHONE & WHISPER API ---
         async function toggleRecording() {
             const key = localStorage.getItem('hablamos_groq_key');
             if(!key) { openVault(); return alert("Bitte trage zuerst deinen Groq-Key im Tresor ein."); }
@@ -475,7 +531,7 @@
             const formData = new FormData();
             formData.append("file", file);
             formData.append("model", "whisper-large-v3-turbo");
-            formData.append("language", "es"); // Zwingt Whisper, nach spanischen Wörtern zu lauschen (höhere Trefferquote!)
+            formData.append("language", "es");
 
             try {
                 const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
@@ -498,9 +554,10 @@
             }
         }
 
-        // --- GROQ AI LOGIC (LLaMA 3.1 8B JSON MODE + Deutsches Feedback) ---
+        // --- GROQ AI LOGIC (Syntaktisch + semantisch tolerantere Bewertung) ---
         async function processUserInput(text) {
             loadingText.innerText = "Lehrer analysiert...";
+            loadingText.style.display = 'block';
             appendUserHTML(text, null); 
 
             const key = localStorage.getItem('hablamos_groq_key');
@@ -508,14 +565,21 @@
             const diff = diffSelect.value;
             
             const sysPrompt = `
-Du bist ein Spanisch-Lehrer. Schwierigkeit: ${diff}.
-ERLAUBTE VOKABELN: ${vocab}. BENUTZE NIEMALS ANDERE WÖRTER!
-ANTI-ECHO: Wiederhole niemals einfach den Satz des Users. Du MUSST zwingend EINE neue inhaltliche Frage stellen.
+Du bist ein wohlwollender Spanisch-Lehrer. Schwierigkeit: ${diff}.
+ERLAUBTE VOKABELN / FOKUS: ${vocab}.
+EVALUATIONSRICHTLINIEN:
+- Bewertungsstatus: 
+  * "green": Wenn der Satz grammatikalisch korrekt ist und im Kontext Sinn macht. Auch wenn der User ein Synonym verwendet oder ein verständliches Wort wählt, das vielleicht nicht das perfekte Schulbuchwort ist, akzeptiere es zwingend als "green" (richtig)! Du darfst im Feedback-Text sanft auf noch gebräuchlichere Wörter hinweisen.
+  * "yellow": Kleine Grammatikfehler oder Schreibfehler, der Satz bleibt aber verständlich.
+  * "red": Völlig unverständlich oder schwerer Grammatikfehler.
+- DAS FEEDBACK MUSS AUF DEUTSCH SEIN.
+- ANTI-ECHO: Wiederhole niemals einfach den Satz des Users. Du MUSST zwingend EINE neue inhaltliche Frage auf Spanisch stellen.
+
 GIB DEINE ANTWORT ZWINGEND IM FOLGENDEN JSON FORMAT ZURÜCK:
 {
   "feedback": {
-    "status": "green", // green (perfekt), yellow (kleiner Grammatikfehler), red (falsch)
-    "text": "HIER KOMMT DAS DEUTSCHE FEEDBACK. Erkläre dem User auf Deutsch (z.B. 'Super Satz!', 'Fast richtig, aber...') wie seine Grammatik war."
+    "status": "green",
+    "text": "Kurzes deutsches Feedback zur Grammatik/Wortwahl des Users."
   },
   "reply": "Spanische Antwort und neue Frage."
 }`;
