@@ -635,7 +635,7 @@ GIB DEINE ANTWORT ZWINGEND IM FOLGENDEN JSON FORMAT ZURÜCK:
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
                     body: JSON.stringify({
-                        model: 'llama-3.1-8b-instant',
+                        model: 'model: 'llama-3.3-70b-versatile',
                         messages: [
                             {role: "system", content: `Stelle exakt EINE einfache Frage auf Spanisch, die das Wort '${randomWord}' beinhaltet. Nur Spanisch, kein JSON hier.`}
                         ],
